@@ -6,6 +6,10 @@ outputs/
 checkpoint_*.pt
 archive.zip
 
+# But DO include visualization assets
+!assets/
+!assets/**/*.png
+
 # Python
 __pycache__/
 *.py[cod]

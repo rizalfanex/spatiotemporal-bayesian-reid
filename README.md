@@ -680,14 +680,14 @@ Output file `sweep_bayesian_trained/bayesian_sweep_results.csv` will contain all
 ### Visualization: Performance Comparison
 
 <div align="center">
-<img src="outputs/result_all/fig01_metrics_comparison.png" width="800" alt="Performance comparison across all configurations">
+<img src="assets/figures/fig01_metrics_comparison.png" width="800" alt="Performance comparison across all configurations">
 <p><em>Figure 1: Metrics across baseline pretrained, baseline trained, and Bayesian-trained configurations.</em></p>
 </div>
 
 ### Visualization: Bayesian Gain Analysis
 
 <div align="center">
-<img src="outputs/result_all/fig02_bayesian_gain_over_trained.png" width="700" alt="Absolute performance gains from Bayesian re-ranking">
+<img src="assets/figures/fig02_bayesian_gain_over_trained.png" width="700" alt="Absolute performance gains from Bayesian re-ranking">
 <p><em>Figure 2: Absolute mAP gains when applying Bayesian re-ranking to the trained baseline.</em></p>
 </div>
 
@@ -721,14 +721,14 @@ This exhaustive search ensures the reported results are **objectively selected**
 ### Visualization: Rank-1 Heatmap
 
 <div align="center">
-<img src="outputs/result_all/fig05_sweep_heatmap_rank1.png" width="750" alt="Rank-1 performance across hyperparameter space">
+<img src="assets/figures/fig05_sweep_heatmap_rank1.png" width="750" alt="Rank-1 performance across hyperparameter space">
 <p><em>Figure 3: Rank-1 metric heatmap. Darker regions indicate better performance. Peak observed at β≈0.02, γ=0.01.</em></p>
 </div>
 
 ### Visualization: mAP Heatmap
 
 <div align="center">
-<img src="outputs/result_all/fig06_sweep_heatmap_map.png" width="750" alt="mAP performance across hyperparameter space">
+<img src="assets/figures/fig06_sweep_heatmap_map.png" width="750" alt="mAP performance across hyperparameter space">
 <p><em>Figure 4: Mean Average Precision heatmap. Best mAP=0.2979 at β=0.03, γ=0.01.</em></p>
 </div>
 
@@ -755,7 +755,7 @@ Based on the sweep, the top 5 configurations by mAP are:
 The following visualization shows learned camera transition probabilities, revealing the implicit spatial structure of the Market-1501 surveillance network:
 
 <div align="center">
-<img src="outputs/result_all/fig07_camera_transition_heatmap.png" width="700" alt="Camera transition probability matrix">
+<img src="assets/figures/fig07_camera_transition_heatmap.png" width="700" alt="Camera transition probability matrix">
 <p><em>Figure 5: Camera-to-camera transition probability heatmap. Shows which camera pairs are commonly traversed by the same person.</em></p>
 </div>
 
@@ -765,19 +765,19 @@ The Bayesian re-ranking re-orders gallery results for query images. Below are qu
 
 #### Example 1: Improved Ranking
 <div align="center">
-<img src="outputs/result_all/example_01_improved_q184.png" width="900" alt="Query 184 retrieval example">
+<img src="assets/figures/example_01_improved_q184.png" width="900" alt="Query 184 retrieval example">
 <p><em>Bayesian re-ranking elevates true matches higher by accounting for camera transitions and time consistency.</em></p>
 </div>
 
 #### Example 2: Cross-Camera Consistency
 <div align="center">
-<img src="outputs/result_all/example_02_improved_q212.png" width="900" alt="Query 212 retrieval example">
+<img src="assets/figures/example_02_improved_q212.png" width="900" alt="Query 212 retrieval example">
 <p><em>Spatio-temporal priors favor matches that respect realistic movement between camera views.</em></p>
 </div>
 
 #### Example 3: Temporal Plausibility
 <div align="center">
-<img src="outputs/result_all/example_05_improved_q344.png" width="900" alt="Query 344 retrieval example">
+<img src="assets/figures/example_05_improved_q344.png" width="900" alt="Query 344 retrieval example">
 <p><em>Gallery results are re-ranked to match temporal expectations given camera-to-camera transitions.</em></p>
 </div>
 
@@ -786,7 +786,7 @@ The Bayesian re-ranking re-orders gallery results for query images. Below are qu
 All retrieval examples combined for visual inspection:
 
 <div align="center">
-<img src="outputs/result_all/fig08_qualitative_collage.png" width="900" alt="Comprehensive qualitative results">
+<img src="assets/figures/fig08_qualitative_collage.png" width="900" alt="Comprehensive qualitative results">
 <p><em>Figure 6: Grid of multiple retrieval examples showing diverse cases where Bayesian re-ranking improves ranking.</em></p>
 </div>
 
@@ -832,12 +832,12 @@ python -c "import numpy as np; f = np.load('features/query_features.npy'); print
 The training process shows convergence of both loss and accuracy:
 
 <div align="center">
-<img src="outputs/result_all/fig03_training_loss_curve.png" width="750" alt="Training loss over 100 epochs">
+<img src="assets/figures/fig03_training_loss_curve.png" width="750" alt="Training loss over 100 epochs">
 <p><em>Figure 7: Training loss (triplet + cross-entropy). Converges around epoch 60-70.</em></p>
 </div>
 
 <div align="center">
-<img src="outputs/result_all/fig04_training_accuracy_curve.png" width="750" alt="Training accuracy over 100 epochs">
+<img src="assets/figures/fig04_training_accuracy_curve.png" width="750" alt="Training accuracy over 100 epochs">
 <p><em>Figure 8: Training accuracy. Reaches 95%+ by epoch 80.</em></p>
 </div>
 
