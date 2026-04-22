@@ -100,81 +100,82 @@ This repository provides the following main contributions:
 
 ## 4.1 Visual Representation
 
-The visual branch of the proposed pipeline is built on **ResNet50**, which is used to encode each pedestrian image into a compact discriminative embedding. In this project, two visual configurations are evaluated in order to separate the effect of generic visual features from the effect of task-specific representation learning.
+The proposed framework uses **ResNet50** as the visual backbone to encode each pedestrian image into a discriminative embedding vector. Two visual configurations are evaluated in order to distinguish the contribution of generic pretrained features from task-specific person ReID representations.
 
-**Baseline-Pretrained** uses an ImageNet-pretrained ResNet50 directly for feature extraction without any person ReID fine-tuning. This setting serves as a weak visual baseline and reflects the retrieval performance obtained from generic semantic features alone.
+**Baseline-Pretrained** uses an ImageNet-pretrained ResNet50 directly for feature extraction without additional ReID fine-tuning. This setting represents the visual retrieval capability obtained from general-purpose semantic features.
 
-**Baseline-Trained** uses the same backbone after supervised fine-tuning on the Market-1501 training split with identity classification. This setting provides a stronger visual baseline because the embedding space becomes better aligned with the person re-identification objective.
+**Baseline-Trained** uses the same ResNet50 backbone after supervised fine-tuning on the Market-1501 training split with identity classification. This configuration is intended to learn person-specific discriminative cues and produce a more suitable embedding space for retrieval.
 
-For each query and gallery image, the network outputs a **2048-dimensional feature vector**. These features are then compared using visual similarity to obtain an initial retrieval ranking. Therefore, the visual branch provides the primary appearance-based evidence before any spatio-temporal reasoning is applied.
+For each query and gallery image, the network extracts a **2048-dimensional feature vector**. Visual similarity is then computed between query and gallery embeddings to produce the initial ranking list. Accordingly, the visual branch serves as the primary appearance-based retrieval component, while the spatio-temporal module acts as a ranking refinement mechanism.
 
 ---
 
 ## 4.2 Spatio-Temporal Prior Construction
 
-To complement visual similarity, the proposed framework constructs two statistical priors from the training metadata: a **camera transition prior** and a **temporal delta prior**. These priors capture how identities move across cameras and how much time difference is typically observed between cross-camera appearances.
+To complement visual evidence, the proposed method constructs two metadata-driven priors from the training split: a **camera transition prior** and a **temporal delta prior**. These priors capture the likelihood of cross-camera movements and the plausibility of time intervals between observations.
 
 ### Camera Transition Prior
 
-The camera transition prior estimates how likely a person observed in a query camera `c_q` reappears in a gallery camera `c_g`. It is defined as:
+The camera transition prior models the probability that a person observed in query camera $c_q$ reappears in gallery camera $c_g$. It is defined as
 
-```text
-P(c_g | c_q)
-```
+$$
+P(c_g \mid c_q).
+$$
 
-This probability is estimated from positive cross-camera identity pairs extracted from the training split. In practice, it models the transition tendency between camera pairs. A larger value indicates that a transition from `c_q` to `c_g` is more frequently observed in the training data and is therefore more plausible during retrieval.
+This probability is estimated from positive cross-camera identity pairs in the training data. A higher value of $P(c_g \mid c_q)$ indicates that transitions from camera $c_q$ to camera $c_g$ are more frequently observed and therefore more plausible during retrieval.
 
 ### Temporal Delta Prior
 
-The temporal delta prior models the plausibility of the time gap between a query image and a gallery image, conditioned on the corresponding camera pair. It is defined as:
+The temporal delta prior models the probability of observing a time difference $\Delta t$ between a query image and a gallery image, conditioned on the corresponding camera pair. It is defined as
 
-```text
-P(Δt | c_q, c_g)
-```
+$$
+P(\Delta t \mid c_q, c_g).
+$$
 
-where `Δt` denotes the absolute frame or time difference between two observations. Instead of using raw continuous values directly, the time difference is discretized into interval bins:
+Instead of using raw continuous time differences directly, $\Delta t$ is discretized into a set of interval bins:
 
-- `0-100`
-- `101-500`
-- `501-1000`
-- `1001-5000`
-- `5001-10000`
-- `10001-20000`
-- `20001-50000`
-- `50000+`
+- $0$--$100$
+- $101$--$500$
+- $501$--$1000$
+- $1001$--$5000$
+- $5001$--$10000$
+- $10001$--$20000$
+- $20001$--$50000$
+- $50000+$
 
-This binning strategy makes the temporal prior more stable and easier to estimate from finite training samples. As a result, the system can learn whether a candidate match is not only visually similar, but also temporally reasonable for the given camera transition.
+This discretization stabilizes probability estimation and converts raw metadata into a structured probabilistic prior suitable for re-ranking.
 
 ---
 
 ## 4.3 Bayesian Re-ranking
 
-After visual feature extraction, each query-gallery pair is first assigned a visual similarity score. The proposed method then refines this score by incorporating the learned spatio-temporal priors through a Bayesian-style additive scoring function.
+After visual feature extraction, each query-gallery pair $(q, g)$ is first assigned a visual similarity score, denoted by $s_{\mathrm{vis}}(q,g)$. The proposed method then refines this score by incorporating the camera transition prior and temporal delta prior into a Bayesian-style re-ranking formulation.
 
 Let:
 
-- `s_vis(q, g)` be the visual similarity between query `q` and gallery `g`
-- `P(c_g | c_q)` be the camera transition prior
-- `P(Δt | c_q, c_g)` be the temporal delta prior
+- $s_{\mathrm{vis}}(q,g)$ denote the visual similarity between query $q$ and gallery $g$,
+- $P(c_g \mid c_q)$ denote the camera transition prior,
+- $P(\Delta t \mid c_q, c_g)$ denote the temporal delta prior.
 
-The final score is computed as:
+The final retrieval score is computed as
 
-```text
-s_final(q, g) = s_vis(q, g)
-              + β * log P(c_g | c_q)
-              + γ * log P(Δt | c_q, c_g)
-```
+$$
+s_{\mathrm{final}}(q,g)
+=
+s_{\mathrm{vis}}(q,g)
++
+\beta \log P(c_g \mid c_q)
++
+\gamma \log P(\Delta t \mid c_q, c_g),
+$$
 
-where:
+where $\beta$ controls the influence of the camera transition prior and $\gamma$ controls the influence of the temporal delta prior.
 
-- `β` controls the contribution of the camera transition prior
-- `γ` controls the contribution of the temporal delta prior
+This formulation preserves visual similarity as the dominant retrieval signal while introducing spatio-temporal plausibility as an auxiliary constraint. In this way, a gallery candidate is promoted not only because it is visually similar to the query, but also because it is statistically consistent with the expected inter-camera transition and temporal interval.
 
-This formulation preserves the visual branch as the dominant retrieval signal while introducing spatio-temporal plausibility as an additional constraint. In other words, a gallery sample is favored not only because it looks similar to the query, but also because it is statistically consistent with the expected camera transition and time interval.
+A larger value of $\beta$ gives more weight to camera transition consistency, whereas a larger value of $\gamma$ increases the contribution of temporal compatibility. The final values of these parameters are selected through systematic hyperparameter sweep experiments so that the re-ranking stage is supported by empirical evidence rather than arbitrary manual choice.
 
-A larger `β` increases the influence of inter-camera transition likelihood, while a larger `γ` increases the influence of time-gap consistency. The final values of these two parameters are selected through systematic hyperparameter sweep experiments, ensuring that the Bayesian re-ranking stage is supported by empirical evidence rather than arbitrary manual choice.
-
-Overall, the proposed methodology can be interpreted as a two-stage retrieval framework: the first stage produces appearance-based candidates through deep visual embeddings, and the second stage refines their ranking using spatio-temporal Bayesian constraints derived from the training metadata.
+Overall, the proposed methodology can be interpreted as a two-stage retrieval framework: the first stage produces appearance-based ranking through deep visual embeddings, and the second stage refines that ranking using spatio-temporal Bayesian constraints derived from training metadata.
 ---
 
 # 5. Experimental Environment
