@@ -134,39 +134,31 @@ $$
 
 Instead of using raw continuous time differences directly, $\Delta t$ is discretized into a set of interval bins:
 
-- $0$--$100$
-- $101$--$500$
-- $501$--$1000$
-- $1001$--$5000$
-- $5001$--$10000$
-- $10001$--$20000$
-- $20001$--$50000$
-- $50000+$
+- 0-100
+- 101-500
+- 501-1000
+- 1001-5000
+- 5001-10000
+- 10001-20000
+- 20001-50000
+- 50000+
 
 This discretization stabilizes probability estimation and converts raw metadata into a structured probabilistic prior suitable for re-ranking.
 
----
-
 ## 4.3 Bayesian Re-ranking
 
-After visual feature extraction, each query-gallery pair $(q, g)$ is first assigned a visual similarity score, denoted by $s_{\mathrm{vis}}(q,g)$. The proposed method then refines this score by incorporating the camera transition prior and temporal delta prior into a Bayesian-style re-ranking formulation.
+After visual feature extraction, each query-gallery pair $(q, g)$ is first assigned a visual similarity score, denoted by $s_{vis}(q,g)$. The proposed method then refines this score by incorporating the camera transition prior and temporal delta prior into a Bayesian-style re-ranking formulation.
 
 Let:
 
-- $s_{\mathrm{vis}}(q,g)$ denote the visual similarity between query $q$ and gallery $g$,
+- $s_{vis}(q,g)$ denote the visual similarity between query $q$ and gallery $g$,
 - $P(c_g \mid c_q)$ denote the camera transition prior,
 - $P(\Delta t \mid c_q, c_g)$ denote the temporal delta prior.
 
 The final retrieval score is computed as
 
 $$
-s_{\mathrm{final}}(q,g)
-=
-s_{\mathrm{vis}}(q,g)
-+
-\beta \log P(c_g \mid c_q)
-+
-\gamma \log P(\Delta t \mid c_q, c_g),
+s_{final}(q,g) = s_{vis}(q,g) + \beta \log P(c_g \mid c_q) + \gamma \log P(\Delta t \mid c_q, c_g).
 $$
 
 where $\beta$ controls the influence of the camera transition prior and $\gamma$ controls the influence of the temporal delta prior.
@@ -176,6 +168,7 @@ This formulation preserves visual similarity as the dominant retrieval signal wh
 A larger value of $\beta$ gives more weight to camera transition consistency, whereas a larger value of $\gamma$ increases the contribution of temporal compatibility. The final values of these parameters are selected through systematic hyperparameter sweep experiments so that the re-ranking stage is supported by empirical evidence rather than arbitrary manual choice.
 
 Overall, the proposed methodology can be interpreted as a two-stage retrieval framework: the first stage produces appearance-based ranking through deep visual embeddings, and the second stage refines that ranking using spatio-temporal Bayesian constraints derived from training metadata.
+
 ---
 
 # 5. Experimental Environment
