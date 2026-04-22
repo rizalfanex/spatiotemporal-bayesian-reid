@@ -151,21 +151,13 @@ After visual feature extraction, each query-gallery pair $(q, g)$ is first assig
 
 Let:
 
-- $s_{vis}(q,g)$ denote the visual similarity between query $q$ and gallery $g$,
+- $s_{vis}(q,g)$ denote the visual similarity between query $q$ and gallery $g)$,
 - $P(c_g \mid c_q)$ denote the camera transition prior,
 - $P(\Delta t \mid c_q, c_g)$ denote the temporal delta prior.
 
 The final retrieval score is computed as
 
-$$
-s_{\mathrm{final}}(q,g)
-=
-s_{\mathrm{vis}}(q,g)
-+
-\beta \log P(c_g \mid c_q)
-+
-\gamma \log P(\Delta t \mid c_q, c_g).
-$$
+$$ s_{\mathrm{final}}(q,g) = s_{\mathrm{vis}}(q,g) + \beta \log P(c_g \mid c_q) + \gamma \log P(\Delta t \mid c_q, c_g). $$
 
 where $\beta$ controls the influence of the camera transition prior and $\gamma$ controls the influence of the temporal delta prior.
 
